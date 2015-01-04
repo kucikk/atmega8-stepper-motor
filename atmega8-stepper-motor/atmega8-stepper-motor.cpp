@@ -10,10 +10,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#define TICK_DELAY 10
+#define TICK_DELAY 1
 
 
-/*
+//*
 uint8_t seq[8] = {
 	0b1000,
 	0b1100,
@@ -24,7 +24,7 @@ uint8_t seq[8] = {
 	0b0001,
 	0b1001
 };
-*/
+/*/
 uint8_t seq[8] = {
 	0b1010,
 	0b1100,
@@ -35,6 +35,7 @@ uint8_t seq[8] = {
 	0b0101,
 	0b1001
 };
+// */
 
 
 
@@ -51,12 +52,16 @@ int main(void) {
     while(1) {
 		pressed = !(PINC & (1 << PC5));
 		
-		for (uint8_t i = 0; i < 8; i++) {
-			if (pressed && !(i & 0x01)) {
-				continue;
+		if (pressed) {
+			for (uint8_t i = 0; i < 8; i++) {
+				PORTB = (PORTB & 0xe1) | ((seq[i] & 0x0f) << 1);
+				_delay_ms(TICK_DELAY);
 			}
-			PORTB = (PORTB & 0xe1) | ((seq[i] & 0x0f) << 1);
-			_delay_ms(TICK_DELAY);
+		} else {
+			for (uint8_t i = 8; i > 0; i--) {
+				PORTB = (PORTB & 0xe1) | ((seq[i - 1] & 0x0f) << 1);
+				_delay_ms(TICK_DELAY);
+			}
 		}
     }
 }
